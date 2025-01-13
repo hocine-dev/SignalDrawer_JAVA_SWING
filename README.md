@@ -1,5 +1,3 @@
-Voici un fichier README.md pour votre projet :
-
 ```markdown
 # SignalDrawer
 
