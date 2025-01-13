@@ -266,6 +266,7 @@ public class FenetrePrincipale extends JFrame {
             }
 
             x += step; // Passer au bit suivant
+            //fin
         }
     }
 
