@@ -1,4 +1,3 @@
-```markdown
 # SignalDrawer
 
 SignalDrawer est une application Java Swing interactive qui permet de dessiner des signaux numériques à partir d'une suite binaire entrée par l'utilisateur. Elle supporte plusieurs types de codage, notamment NRZ, NRZI, Manchester, Miller et Manchester différentiel.
