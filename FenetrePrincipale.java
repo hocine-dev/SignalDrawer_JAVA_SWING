@@ -27,6 +27,7 @@ public class FenetrePrincipale extends JFrame {
         JLabel label = new JLabel("Votre suite binaire ?");
         label.setFont(new Font("Arial", Font.BOLD, 14)); // Police stylisée pour le texte
         JTextField text = new JTextField(10);
+        text.setText("1101000101");
         String[] type = {"NRZ", "NRZI", "manshester", "manchester différentiel", "miller"};
         JComboBox<String> combo = new JComboBox<>(type);
         JButton button = new JButton("Valider");
@@ -175,17 +176,18 @@ public class FenetrePrincipale extends JFrame {
 
         int x = 50; // Position initiale en x
         int step = 50; // Largeur de chaque bit
-        int currentLevel = yZero; // Niveau initial pour NRZI et autres
+        int currentLevel = yMinus5; // Niveau initial pour NRZI et autres
 
         boolean previousBit = false; // Utilisé pour certains codages (NRZI, Manchester différentiel)
 
         for (int i = 0; i < binarySequence.length(); i++) {
             char bit = binarySequence.charAt(i);
+            boolean bitAsBoolean = (bit == '1');  // true if bitAsBoolean is '1', false if bitAsBoolean is '0'
             int nextLevel = currentLevel;
 
             switch (selectedEncoding) {
                 case "NRZ":
-                    if (bit == '1') {
+                    if (bitAsBoolean == true) {
                         nextLevel = yPlus5; // Niveau haut pour "1"
                     } else {
                         nextLevel = yMinus5; // Niveau bas pour "0"
@@ -196,7 +198,7 @@ public class FenetrePrincipale extends JFrame {
                         g2d.drawLine(x, currentLevel, x, nextLevel); // Ligne verticale
                     }
 
-                    // Dessiner la ligne horizontale pour le bit
+                    // Dessiner la ligne horizontale pour le bitAsBoolean
                     g2d.drawLine(x, nextLevel, x + step, nextLevel);
 
                     currentLevel = nextLevel; // Mettre à jour le niveau actuel
@@ -204,7 +206,7 @@ public class FenetrePrincipale extends JFrame {
 
 
                 case "NRZI":
-                    if (bit == '0') {
+                    if (bitAsBoolean == false) {
                         nextLevel = yPlus5; // Niveau haut pour "1"
                     } else {
                         nextLevel = yMinus5; // Niveau bas pour "0"
@@ -215,14 +217,18 @@ public class FenetrePrincipale extends JFrame {
                         g2d.drawLine(x, currentLevel, x, nextLevel); // Ligne verticale
                     }
 
-                    // Dessiner la ligne horizontale pour le bit
+                    // Dessiner la ligne horizontale pour le bitAsBoolean
                     g2d.drawLine(x, nextLevel, x + step, nextLevel);
 
                     currentLevel = nextLevel; // Mettre à jour le niveau actuel
                     break;
 
-                    case "manshester":
-                    if (bit == '1') {
+                case "manshester":
+                    if (previousBit == bitAsBoolean) {
+                        g2d.drawLine(x, yPlus5, x, yMinus5); // Transition verticale descendante
+
+                    }
+                    if (bitAsBoolean == true) {
                         // 1 : Transition de +nV à -nV
                         g2d.drawLine(x, yPlus5, x + step / 2, yPlus5); // Ligne horizontale haute
                         g2d.drawLine(x + step / 2, yPlus5, x + step / 2, yMinus5); // Transition verticale descendante
@@ -233,13 +239,47 @@ public class FenetrePrincipale extends JFrame {
                         g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante
                         g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
                     }
+
+                    previousBit = bitAsBoolean;
+
+                    break;
+                case "manchester différentiel":
+
+                    if (bitAsBoolean) {
+
+                    if (currentLevel == yMinus5) {
+                        g2d.drawLine(x, yMinus5, x + step / 2, yMinus5); // Ligne horizontale basse
+                        g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
+                        g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
+                        currentLevel = yPlus5;
+                    }else{
+                        g2d.drawLine(x, yPlus5, x + step/2, yPlus5); // Ligne horizontale haute
+                        g2d.drawLine(x + step / 2, yPlus5, x + step / 2,yMinus5); // Transition verticale descendants au milieu
+                        g2d.drawLine(x+ step/2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
+                        currentLevel = yMinus5;
+                    }}else{
+                        if (currentLevel == yMinus5) {
+                            g2d.drawLine(x, yMinus5, x,yPlus5 ); // Transition verticale montant sur place
+                            g2d.drawLine(x, yPlus5, x + step/2, yPlus5); // Ligne horizontale haute
+                            g2d.drawLine(x + step / 2, yPlus5, x + step / 2,yMinus5); // Transition verticale descendants au milieu
+                            g2d.drawLine(x+ step/2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
+                            currentLevel = yMinus5;
+                        }else{
+                            g2d.drawLine(x , yPlus5, x ,yMinus5); // Transition verticale descendants sur place
+                            g2d.drawLine(x, yMinus5, x + step/2, yMinus5);     // Ligne horizontale basse
+                            g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
+                            g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
+                            currentLevel = yPlus5;
+                    }}
+
+
+                    previousBit = bitAsBoolean;
+
                     break;
 
 
-
-
                 case "miller":
-                    if (bit == '1') {
+                    if (bitAsBoolean == true) {
                         // Transition au milieu pour "1"
                         g2d.drawLine(x, currentLevel, x + step / 2, currentLevel); // Ligne horizontale
                         nextLevel = (currentLevel == yZero) ? yPlus5 : yZero; // Transition de niveau
@@ -252,20 +292,10 @@ public class FenetrePrincipale extends JFrame {
                     currentLevel = nextLevel; // Mettre à jour le niveau actuel
                     break;
 
-                case "manchester différentiel":
-                    if (bit == '1') {
-                        previousBit = !previousBit; // Inversion si "1"
-                    }
-                    nextLevel = previousBit ? yPlus5 : yMinus5;
-                    g2d.drawLine(x, currentLevel, x, nextLevel); // Ligne verticale si nécessaire
-                    g2d.drawLine(x, nextLevel, x + step / 2, nextLevel); // Ligne horizontale
-                    g2d.drawLine(x + step / 2, nextLevel, x + step / 2, yZero); // Ligne centrale
-                    g2d.drawLine(x + step / 2, yZero, x + step, yZero); // Ligne horizontale finale
-                    currentLevel = nextLevel;
-                    break;
+
             }
 
-            x += step; // Passer au bit suivant
+            x += step; // Passer au bitAsBoolean suivant
         }
     }
 
