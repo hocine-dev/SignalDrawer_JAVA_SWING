@@ -148,7 +148,7 @@ public class FenetrePrincipale extends JFrame {
 
         // Couleur des lignes de la grille (gris clair)
         g2d.setColor(Color.LIGHT_GRAY);
-        g2d.setStroke(new BasicStroke(1)); // Lignes fines pour la grille
+        g2d.setStroke(dashedStroke); // Lignes fines pour la grille
 
         // Dessiner les lignes verticales pour séparer les bits
         for (int x = 50; x < width; x += 50) {
@@ -184,6 +184,12 @@ public class FenetrePrincipale extends JFrame {
             char bit = binarySequence.charAt(i);
             boolean bitAsBoolean = (bit == '1');  // true if bitAsBoolean is '1', false if bitAsBoolean is '0'
             int nextLevel = currentLevel;
+
+            // Draw the bit as text above the signal
+            g2d.setFont(new Font("Arial", Font.BOLD, 16)); // Set font for the text
+            int textX = x + step / 2 - 5; // Center the bit in the time unit
+            int textY = yZero - 60; // Position above the time units
+            g2d.drawString(String.valueOf(bit), textX, textY);
 
             switch (selectedEncoding) {
                 case "NRZ":
@@ -247,30 +253,32 @@ public class FenetrePrincipale extends JFrame {
 
                     if (bitAsBoolean) {
 
-                    if (currentLevel == yMinus5) {
-                        g2d.drawLine(x, yMinus5, x + step / 2, yMinus5); // Ligne horizontale basse
-                        g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
-                        g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
-                        currentLevel = yPlus5;
-                    }else{
-                        g2d.drawLine(x, yPlus5, x + step/2, yPlus5); // Ligne horizontale haute
-                        g2d.drawLine(x + step / 2, yPlus5, x + step / 2,yMinus5); // Transition verticale descendants au milieu
-                        g2d.drawLine(x+ step/2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
-                        currentLevel = yMinus5;
-                    }}else{
                         if (currentLevel == yMinus5) {
-                            g2d.drawLine(x, yMinus5, x,yPlus5 ); // Transition verticale montant sur place
-                            g2d.drawLine(x, yPlus5, x + step/2, yPlus5); // Ligne horizontale haute
-                            g2d.drawLine(x + step / 2, yPlus5, x + step / 2,yMinus5); // Transition verticale descendants au milieu
-                            g2d.drawLine(x+ step/2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
-                            currentLevel = yMinus5;
-                        }else{
-                            g2d.drawLine(x , yPlus5, x ,yMinus5); // Transition verticale descendants sur place
-                            g2d.drawLine(x, yMinus5, x + step/2, yMinus5);     // Ligne horizontale basse
+                            g2d.drawLine(x, yMinus5, x + step / 2, yMinus5); // Ligne horizontale basse
                             g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
                             g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
                             currentLevel = yPlus5;
-                    }}
+                        } else {
+                            g2d.drawLine(x, yPlus5, x + step / 2, yPlus5); // Ligne horizontale haute
+                            g2d.drawLine(x + step / 2, yPlus5, x + step / 2, yMinus5); // Transition verticale descendants au milieu
+                            g2d.drawLine(x + step / 2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
+                            currentLevel = yMinus5;
+                        }
+                    } else {
+                        if (currentLevel == yMinus5) {
+                            g2d.drawLine(x, yMinus5, x, yPlus5); // Transition verticale montant sur place
+                            g2d.drawLine(x, yPlus5, x + step / 2, yPlus5); // Ligne horizontale haute
+                            g2d.drawLine(x + step / 2, yPlus5, x + step / 2, yMinus5); // Transition verticale descendants au milieu
+                            g2d.drawLine(x + step / 2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
+                            currentLevel = yMinus5;
+                        } else {
+                            g2d.drawLine(x, yPlus5, x, yMinus5); // Transition verticale descendants sur place
+                            g2d.drawLine(x, yMinus5, x + step / 2, yMinus5);     // Ligne horizontale basse
+                            g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
+                            g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
+                            currentLevel = yPlus5;
+                        }
+                    }
 
 
                     previousBit = bitAsBoolean;
@@ -279,17 +287,47 @@ public class FenetrePrincipale extends JFrame {
 
 
                 case "miller":
-                    if (bitAsBoolean == true) {
-                        // Transition au milieu pour "1"
-                        g2d.drawLine(x, currentLevel, x + step / 2, currentLevel); // Ligne horizontale
-                        nextLevel = (currentLevel == yZero) ? yPlus5 : yZero; // Transition de niveau
-                        g2d.drawLine(x + step / 2, currentLevel, x + step / 2, nextLevel); // Ligne verticale
-                        g2d.drawLine(x + step / 2, nextLevel, x + step, nextLevel); // Ligne horizontale
+                    if (bitAsBoolean) {
+
+                        if (currentLevel == yMinus5) {
+                            g2d.drawLine(x, yMinus5, x + step / 2, yMinus5); // Ligne horizontale basse
+                            g2d.drawLine(x + step / 2, yMinus5, x + step / 2, yPlus5); // Transition verticale montante au milieu
+                            g2d.drawLine(x + step / 2, yPlus5, x + step, yPlus5); // Ligne horizontale haute
+                            currentLevel = yPlus5;
+                        } else {
+                            g2d.drawLine(x, yPlus5, x + step / 2, yPlus5); // Ligne horizontale haute
+                            g2d.drawLine(x + step / 2, yPlus5, x + step / 2, yMinus5); // Transition verticale descendants au milieu
+                            g2d.drawLine(x + step / 2, yMinus5, x + step, yMinus5);     // Ligne horizontale basse
+                            currentLevel = yMinus5;
+                        }
                     } else {
-                        // Pas de transition pour "0"
-                        g2d.drawLine(x, currentLevel, x + step, currentLevel); // Ligne horizontale
+                        if (currentLevel == yMinus5) {
+                            if (previousBit == false) {
+                                g2d.drawLine(x, yMinus5, x, yPlus5);
+                                g2d.drawLine(x, yPlus5, x + step, yPlus5);
+                                currentLevel = yPlus5;
+                            } else {
+                                g2d.drawLine(x, yMinus5, x + step, yMinus5); // Ligne horizontale
+                                currentLevel = yMinus5;
+                            }
+
+
+                        } else {
+
+                            if (previousBit == false) {
+                                g2d.drawLine(x, yPlus5, x, yMinus5);
+                                g2d.drawLine(x, yMinus5, x + step, yMinus5);
+                                currentLevel = yMinus5;
+                            } else {
+                                g2d.drawLine(x, yPlus5, x + step, yPlus5); // Ligne horizontale
+                                currentLevel = yPlus5;
+                            }
+                        }
                     }
-                    currentLevel = nextLevel; // Mettre à jour le niveau actuel
+
+
+                    previousBit = bitAsBoolean;
+
                     break;
 
 
